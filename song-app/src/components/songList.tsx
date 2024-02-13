@@ -33,6 +33,7 @@ import {
   Div,
   Divider,
 } from './style/songListStyle';
+import SongStatistics from "./statistics";
 
 
 const SongList: React.FC = () => {
@@ -143,6 +144,7 @@ const SongList: React.FC = () => {
             </Div>
           </Divider>
         </Div>
+        <SongStatistics></SongStatistics>
         <List>
           {filteredSongs.length === 0 ? (
             <NoSongsMessage>No songs available. Add some!</NoSongsMessage>
