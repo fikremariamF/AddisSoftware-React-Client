@@ -52,10 +52,12 @@ function* updateSongSaga(
   action: PayloadAction<Song>
 ): Generator<CallEffect | PutEffect, void, AxiosResponse<any>> {
   try {
+    const { _id, __v, ...requestBody } = action.payload;
+    console.log("action.payload", requestBody);
     const response: AxiosResponse<any> = yield call(
       axios.put,
-      `http://localhost:5001/api/songs/${action.payload.id}`,
-      action.payload
+      `http://localhost:5001/api/songs/${action.payload._id}`,
+      requestBody
     );
     yield put(updateSongSuccess(response.data));
   } catch (error: any) {
@@ -76,6 +78,7 @@ function* updateSongSaga(
 
 function* deleteSongSaga(action: PayloadAction<string>): Generator {
   try {
+    console.log("action.payload", action.payload);
     yield call(
       axios.delete,
       `http://localhost:5001/api/songs/${action.payload}`
@@ -94,6 +97,25 @@ function* deleteSongSaga(action: PayloadAction<string>): Generator {
       });
     }
   }
+}
+
+function* fetchSongsSaga() {
+  try {
+    const response: AxiosResponse<Song[]> = yield call(
+      axios.get,
+      "http://localhost:5001/api/songs"
+    );
+    yield put({ type: "songs/fetchSongsSuccess", payload: response.data });
+  } catch (error: any) {
+    yield put({
+      type: "songs/fetchSongsFailure",
+      payload: "Failed to fetch songs",
+    });
+  }
+}
+
+function* watchFetchSongs() {
+  yield takeLatest("songs/fetchSongsRequest", fetchSongsSaga);
 }
 
 function* watchCreateSong() {

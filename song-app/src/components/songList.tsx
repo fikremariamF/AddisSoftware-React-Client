@@ -164,7 +164,7 @@ const SongList: React.FC = () => {
 
   const handleSave = (songData: Omit<Song, "id">) => {
     if (selectedSong) {
-      dispatch(updateSongRequest({ ...songData, id: selectedSong!.id! }));
+      dispatch(updateSongRequest({ ...songData, _id: selectedSong!._id! }));
     } else {
       dispatch(createSongRequest(songData));
     }
@@ -177,8 +177,9 @@ const SongList: React.FC = () => {
     setIsFormVisible(true);
   };
 
-  const handleDelete = (id: string) => {
-    dispatch(deleteSongRequest(id));
+  const handleDelete = (song: Song) => {
+    console.log("deleting song", song);
+    dispatch(deleteSongRequest(song._id!));
   };
 
   const toggleFormVisibility = () => {
@@ -195,7 +196,7 @@ const SongList: React.FC = () => {
             <NoSongsMessage>No songs available. Add some!</NoSongsMessage>
           ) : (
             songs.map((song) => (
-              <ListItem key={song.id}>
+              <ListItem key={song._id}>
                 <DiscImage src={rotatingDiskGif} alt="Rotating disc" />
                 <SongDetails>
                   <strong>{song.title}</strong>
@@ -209,7 +210,7 @@ const SongList: React.FC = () => {
                     <OptionButton onClick={() => handleEdit(song)}>
                       Edit
                     </OptionButton>
-                    <OptionButton onClick={() => handleDelete(song.id)}>
+                    <OptionButton onClick={() => handleDelete(song)}>
                       Delete
                     </OptionButton>
                   </OptionsMenu>

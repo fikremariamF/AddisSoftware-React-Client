@@ -1,13 +1,6 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import axios from "axios";
-
-interface Song {
-  id: string;
-  title: string;
-  artist: string;
-  album: string;
-  genre: string;
-}
+import { Song } from "../../models/song-model.model";
 
 interface SongsState {
   songs: Song[];
@@ -21,19 +14,24 @@ const songSlice = createSlice({
   name: "songs",
   initialState,
   reducers: {
-    // Action to trigger song creation from a component, caught by a saga
+    fetchSongsRequest(state) {
+    },
+    fetchSongsSuccess(state, action: PayloadAction<Song[]>) {
+      state.songs = action.payload;
+    },
+    fetchSongsFailure(state, action: PayloadAction<string>) {
+    },
     createSongRequest(state, action: PayloadAction<Omit<Song, "id">>) {},
     createSongSuccess(state, action: PayloadAction<Song>) {
-      console.log("fff",action.payload)
+      console.log("fff", action.payload);
       state.songs.push(action.payload);
     },
     createSongFailure(state, action: PayloadAction<string>) {},
 
-    // Similar structure for update and delete operations
     updateSongRequest(state, action: PayloadAction<Song>) {},
     updateSongSuccess(state, action: PayloadAction<Song>) {
       const index = state.songs.findIndex(
-        (song) => song.id === action.payload.id
+        (song) => song._id === action.payload._id
       );
       if (index !== -1) {
         state.songs[index] = action.payload;
@@ -43,7 +41,8 @@ const songSlice = createSlice({
 
     deleteSongRequest(state, action: PayloadAction<string>) {},
     deleteSongSuccess(state, action: PayloadAction<string>) {
-      state.songs = state.songs.filter((song) => song.id !== action.payload);
+      console.log("delete.payload", action.payload);
+      state.songs = state.songs.filter((song) => song._id !== action.payload);
     },
     deleteSongFailure(state, action: PayloadAction<string>) {},
   },
