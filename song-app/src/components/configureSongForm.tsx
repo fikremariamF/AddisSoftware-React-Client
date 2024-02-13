@@ -2,6 +2,15 @@
 import styled from "@emotion/styled";
 import React, { useState, useEffect } from "react";
 import { Song } from "../models/song-model.model";
+import {
+  StyledForm,
+  StyledInput,
+  StyledButton,
+  CloseButton,
+  Container,
+  StyledSelect
+} from './style/confifureSongFormStyle'; 
+
 
 interface SongFormProps {
   song?: Song;
@@ -9,62 +18,6 @@ interface SongFormProps {
   onUpdate?: (song: Song) => void;
   onClose: () => void;
 }
-
-const StyledForm = styled.form`
-  max-width: 40rem;
-  width: 20rem;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  margin-top: 20px;
-`;
-
-const StyledInput = styled.input`
-  padding: 10px;
-  margin-bottom: 10px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-`;
-
-const StyledButton = styled.button`
-  padding: 10px 20px;
-  background-color: #3498db;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  &:hover {
-    background-color: #2980b9;
-  }
-`;
-
-const CloseButton = styled.button`
-  padding: 10px 15px;
-  background-color: transparent; // Transparent background
-  color: #333; // Text color that contrasts with the background
-  border: 1px solid grey; // Grey border
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background-color 0.3s ease, border-color 0.3s ease;
-
-  &:hover {
-    background-color: rgba(
-      0,
-      0,
-      0,
-      0.2
-    );
-    border-color: #fff; 
-  }
-`;
-
-const Container = styled.button`
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  background: white;
-  border: none;
-`;
 
 const SongForm: React.FC<SongFormProps> = ({
   song,
@@ -83,8 +36,14 @@ const SongForm: React.FC<SongFormProps> = ({
     if (song) setFormState(song);
   }, [song]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormState({ ...formState, [e.target.name]: e.target.value });
+  const handleChange = (
+    event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
+    const { name, value } = event.target;
+    setFormState((prevState) => ({
+      ...prevState,
+      [name]: value,
+    }));
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -95,6 +54,8 @@ const SongForm: React.FC<SongFormProps> = ({
       onSave(formState);
     }
   };
+
+  
 
   return (
     <StyledForm onSubmit={handleSubmit}>
@@ -119,13 +80,21 @@ const SongForm: React.FC<SongFormProps> = ({
         placeholder="Album"
         required
       />
-      <StyledInput
+      <StyledSelect
         name="genre"
         value={formState.genre}
         onChange={handleChange}
-        placeholder="Genre"
         required
-      />
+      >
+        <option value="">Select Genre</option>
+        <option value="Pop">Pop</option>
+        <option value="Rock">Rock</option>
+        <option value="Jazz">Jazz</option>
+        <option value="Classical">Classical</option>
+        <option value="Electronic">Electronic</option>
+        <option value="Reggae">Reggae</option>
+        <option value="Other">Other</option>
+      </StyledSelect>
 
       <Container>
         <CloseButton onClick={onClose}>Close</CloseButton>

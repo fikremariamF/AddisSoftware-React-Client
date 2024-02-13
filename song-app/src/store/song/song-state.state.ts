@@ -49,6 +49,9 @@ const songSlice = createSlice({
 });
 
 export const {
+  fetchSongsRequest,
+  fetchSongsSuccess,
+  fetchSongsFailure,
   createSongRequest,
   createSongSuccess,
   createSongFailure,

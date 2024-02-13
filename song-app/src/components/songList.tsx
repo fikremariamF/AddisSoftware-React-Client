@@ -1,6 +1,6 @@
 /** @jsxImportSource @emotion/react */
 import styled from "@emotion/styled";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { AppDispatch, RootState } from "../store/store";
 import { } from "../store/song/song-state.state";
@@ -11,156 +11,75 @@ import {
   createSongRequest,
   updateSongRequest,
   deleteSongRequest,
+  fetchSongsRequest
 } from "../store/song/song-state.state";
+import Select from "react-select";
 
-// Styled components using Emotion
-const Container = styled.div`
-  width: 100vw;
-  height: 100%;
-  background-color: #ffffff;
-  color: #333;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: row;
-  flex-wrap: no-wrap;
-  gap: 2rem;
-`;
+import {
+  Container,
+  List,
+  Main,
+  ListItem,
+  H2,
+  DiscImage,
+  SongDetails,
+  SidebarContainer,
+  StyledButton,
+  NoSongsMessage,
+  MoreOptions,
+  Input,
+  OptionsMenu,
+  OptionButton,
+  Div,
+  Divider,
+} from './style/songListStyle';
 
-const List = styled.div`
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  gap: 10px;
-  align-atems: flex-start;
-  justtify-content: flex-start;
-  max-height: 90vh;
-  overflow: scroll;
-`;
-
-const Main = styled.div`
-  display: flex;
-  flex-direction: column;
-  flex-grow: 1;
-`;
-
-const ListItem = styled.div`
-  background: #ffffff; // White background for the card
-  border-radius: 8px;
-  box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.1); // Subtle shadow for depth
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 20px;
-  margin: 20px; // Add margin to space out the cards
-  transition: transform 0.2s; // Smooth transition for hover effect
-  position: relative;
-
-  &:hover {
-    transform: translateY(-5px); // Slight raise effect on hover
-    box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.15); // Deeper shadow on hover
-  }
-`;
-
-const H2 = styled.h2`
-  margin: 1rem;
-  font-size: 2rem;
-`;
-
-const DiscImage = styled.img`
-  width: 7rem;
-  height: auto;
-  object-fit: contain;
-`;
-
-const SongDetails = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-`;
-
-const SidebarContainer = styled.div`
-  max-width: 50rem; // Width of the sidebar
-  height: 100%;
-  background: #ffffff; // White background
-  padding: 20px;
-  box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1); // Shadow for depth
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-`;
-
-const StyledButton = styled.button`
-  padding: 10px 20px;
-  background-color: #3498db;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  &:hover {
-    background-color: #2980b9;
-  }
-  align-self: flex-end;
-  margin-right: 20%;
-`;
-
-const NoSongsMessage = styled.div`
-  text-align: center;
-  padding: 20px;
-  color: #666;
-  margin: auto;
-  font-size: 1.4rem;
-`;
-
-const MoreOptions = styled.div`
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  cursor: pointer;
-`;
-
-const OptionsMenu = styled.div`
-  display: none;
-  position: absolute;
-  right:0px;
-  top: 0px;
-  background-color: #fff;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  padding: 0px;
-  z-index: 10;
-  width: 5rem;
-  height: 3rem;
-
-  ${MoreOptions}:hover & {
-    display: block;
-  }
-`;
-
-const OptionButton = styled.button`
-  display: block;
-  background: none;
-  border: none;
-  padding: 2px;
-  width: 100%;
-  height: 1.5rem;
-  text-align: left;
-
-  &:hover {
-    background-color: #f0f0f0;
-  }
-
-  &:hover ${OptionsMenu} {
-    display: block;
-  }
-`;
 
 const SongList: React.FC = () => {
   const [selectedSong, setSelectedSong] = useState<Song | undefined>(undefined);
   const [isFormVisible, setIsFormVisible] = useState(false);
   const [resetFormKey, setResetFormKey] = useState(Date.now());
+  const [genreFilter, setGenreFilter] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
+
 
   const songs = useSelector((state: RootState) => state.songs.songs);
   const dispatch = useDispatch<AppDispatch>();
+
+  useEffect(() => {
+    dispatch(fetchSongsRequest());
+  }, [dispatch]);
+
+  const genreOptions = [
+    { value: "Pop", label: "Pop" },
+    { value: "Rock", label: "Rock" },
+    { value: "Jazz", label: "Jazz" },
+    { value: "Classical", label: "Classical" },
+    { value: "Electronic", label: "Electronic" },
+    { value: "Reggae", label: "Reggae" },
+    { value: "Folk", label: "Folk" },
+    { value: "Blues", label: "Blues" },
+    { value: "Country", label: "Country" },
+    { value: "Hip-Hop", label: "Hip-Hop" },
+    { value: "Other", label: "Other" },
+  ];
+
+  const handleGenreChange = (selectedOptions: any) => {
+    setGenreFilter(selectedOptions);
+  };
+
+  const filteredSongs = songs.filter((song) => {
+    const genreMatches =
+      genreFilter.length === 0 ||
+      genreFilter.some((g: any) => song.genre === g.value);
+    const queryMatches =
+      searchQuery.length === 0 ||
+      song.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      song.artist.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      song.album.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      song.genre.toLowerCase().includes(searchQuery.toLowerCase());
+    return genreMatches && queryMatches;
+  });
 
   const handleSave = (songData: Omit<Song, "id">) => {
     if (selectedSong) {
@@ -190,12 +109,45 @@ const SongList: React.FC = () => {
   return (
     <Container>
       <Main>
-        <H2>Song List</H2>
+        <Div>
+          <H2>Song List</H2>
+          <Divider>
+            <Div>
+              <label>Search:</label>
+              <Input
+                type="text"
+                placeholder="Search"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </Div>
+            <Div>
+              <label>Genre:</label>
+              <Select
+                isMulti
+                options={genreOptions}
+                className="basic-multi-select"
+                classNamePrefix="select"
+                onChange={handleGenreChange}
+                closeMenuOnSelect={false}
+                styles={{
+                  container: (base) => ({
+                    ...base,
+                    minWidth: "15rem",
+                    maxWidth: "20rem",
+                    height: "2rem",
+                    marginTop: "-.5rem",
+                  }),
+                }}
+              />{" "}
+            </Div>
+          </Divider>
+        </Div>
         <List>
-          {songs.length === 0 ? (
+          {filteredSongs.length === 0 ? (
             <NoSongsMessage>No songs available. Add some!</NoSongsMessage>
           ) : (
-            songs.map((song) => (
+            filteredSongs.map((song) => (
               <ListItem key={song._id}>
                 <DiscImage src={rotatingDiskGif} alt="Rotating disc" />
                 <SongDetails>
@@ -235,7 +187,7 @@ const SongList: React.FC = () => {
               onUpdate={handleSave}
               onClose={() => {
                 setIsFormVisible(false);
-                setSelectedSong(undefined); // Reset selected song on close
+                setSelectedSong(undefined);
               }}
             />
           </SidebarContainer>

@@ -31,7 +31,7 @@ function* createSongSaga(
   try {
     const response: AxiosResponse<any> = yield call(
       axios.post,
-      "http://localhost:5001/api/songs",
+      "https://addis-songs.onrender.com/api/songs",
       action.payload
     );
     console.log("response", response.data);
@@ -56,7 +56,7 @@ function* updateSongSaga(
     console.log("action.payload", requestBody);
     const response: AxiosResponse<any> = yield call(
       axios.put,
-      `http://localhost:5001/api/songs/${action.payload._id}`,
+      `https://addis-songs.onrender.com/api/songs/${action.payload._id}`,
       requestBody
     );
     yield put(updateSongSuccess(response.data));
@@ -81,7 +81,7 @@ function* deleteSongSaga(action: PayloadAction<string>): Generator {
     console.log("action.payload", action.payload);
     yield call(
       axios.delete,
-      `http://localhost:5001/api/songs/${action.payload}`
+      `https://addis-songs.onrender.com/api/songs/${action.payload}`
     );
     yield put(deleteSongSuccess(action.payload));
   } catch (error: any) {
@@ -103,7 +103,7 @@ function* fetchSongsSaga() {
   try {
     const response: AxiosResponse<Song[]> = yield call(
       axios.get,
-      "http://localhost:5001/api/songs"
+      "https://addis-songs.onrender.com/api/songs"
     );
     yield put({ type: "songs/fetchSongsSuccess", payload: response.data });
   } catch (error: any) {
@@ -131,5 +131,5 @@ function* watchDeleteSong() {
 }
 
 export default function* rootSaga() {
-  yield all([watchCreateSong(), watchUpdateSong(), watchDeleteSong()]);
+  yield all([watchCreateSong(), watchUpdateSong(), watchDeleteSong(), watchFetchSongs()]);
 }
