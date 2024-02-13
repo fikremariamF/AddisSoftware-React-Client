@@ -2,11 +2,16 @@
 import styled from "@emotion/styled";
 import React, { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { RootState } from "../store/store";
-import { addSong } from "../store/song/song-state.state";
-import rotatingDiskGif from "../assets/rolling-disk.gif"; // Make sure the path is correct
+import { AppDispatch, RootState } from "../store/store";
+import { } from "../store/song/song-state.state";
+import rotatingDiskGif from "../assets/rolling-disk.gif"; 
 import SongForm from "./configureSongForm";
 import { Song } from "../models/song-model.model";
+import {
+  createSongRequest,
+  updateSongRequest,
+  deleteSongRequest,
+} from "../store/song/song-state.state";
 
 // Styled components using Emotion
 const Container = styled.div`
@@ -155,27 +160,25 @@ const SongList: React.FC = () => {
   const [resetFormKey, setResetFormKey] = useState(Date.now());
 
   const songs = useSelector((state: RootState) => state.songs.songs);
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
 
-  const handleSave = (newSong: Song) => {
-    dispatch(addSong({ ...newSong, id: Date.now().toString() }));
-    setIsFormVisible(!isFormVisible);
-    if (!isFormVisible) setResetFormKey(Date.now());
+  const handleSave = (songData: Omit<Song, "id">) => {
+    if (selectedSong) {
+      dispatch(updateSongRequest({ ...songData, id: selectedSong!.id! }));
+    } else {
+      dispatch(createSongRequest(songData));
+    }
+    setIsFormVisible(false);
+    setSelectedSong(undefined);
   };
 
   const handleEdit = (song: Song) => {
-    setSelectedSong(song); 
-    setIsFormVisible(true); 
+    setSelectedSong(song);
+    setIsFormVisible(true);
   };
 
-  const handleDelete = (newSong: Song) => {
-    dispatch(addSong({ ...newSong, id: Date.now().toString() }));
-  };
-
-  const handleUpdate = (updatedSong: Song) => {
-    if (updatedSong.id) {
-      console.log(updatedSong);
-    }
+  const handleDelete = (id: string) => {
+    dispatch(deleteSongRequest(id));
   };
 
   const toggleFormVisibility = () => {
@@ -206,7 +209,7 @@ const SongList: React.FC = () => {
                     <OptionButton onClick={() => handleEdit(song)}>
                       Edit
                     </OptionButton>
-                    <OptionButton onClick={() => handleDelete(song)}>
+                    <OptionButton onClick={() => handleDelete(song.id)}>
                       Delete
                     </OptionButton>
                   </OptionsMenu>
@@ -228,7 +231,7 @@ const SongList: React.FC = () => {
               key={resetFormKey}
               song={selectedSong}
               onSave={handleSave}
-              onUpdate={handleUpdate}
+              onUpdate={handleSave}
               onClose={() => {
                 setIsFormVisible(false);
                 setSelectedSong(undefined); // Reset selected song on close
