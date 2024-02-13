@@ -161,3 +161,4 @@ export const Divider = styled.div`
   align-items: center;
   gap: 3rem;
 `;
+

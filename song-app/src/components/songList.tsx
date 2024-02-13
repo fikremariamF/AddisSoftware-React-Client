@@ -31,7 +31,7 @@ import {
   OptionsMenu,
   OptionButton,
   Div,
-  Divider,
+  Divider
 } from './style/songListStyle';
 import SongStatistics from "./statistics";
 

@@ -68,3 +68,13 @@ export const StyledSelect = styled.select`
     border-color: #007bff; /* Change to any color you prefer */
   }
 `;
+
+export const Statistics = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  background: white;
+  border: none;
+  font-size: 1.5rem;
+  font-weight: bold;
+`;
